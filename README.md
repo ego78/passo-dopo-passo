@@ -47,3 +47,10 @@ La versione registra dati organizzativi e note. Il registro documenti non carica
 - Azioni rapide
 - Priorità evidenziate
 - Migliore esperienza mobile
+
+
+## Versione 2.1 – Diario della gravidanza
+- Diario settimanale automatico
+- Stato emotivo di mamma e papà
+- Ricordi e domande per il medico
+- Cronologia sincronizzata con Google Sheets

@@ -111,7 +111,31 @@
 
       <section id="spese" class="view"><div class="page-head"><div><h1>Spese</h1><p>Costi sanitari, scolastici e detraibili.</p></div><div class="total-chip">Totale: <strong id="expenseTotal">€ 0,00</strong></div></div><form id="expenseForm" class="panel form-grid"><label>Descrizione<input id="expenseTitle" required placeholder="Visita specialistica"></label><label>Importo (€)<input id="expenseAmount" type="number" min="0" step="0.01" required></label><label>Data<input id="expenseDate" type="date" required></label><label>Categoria<select id="expenseCategory"><option>Sanità</option><option>Terapie</option><option>Scuola</option><option>Trasporti</option><option>Altro</option></select></label><button class="primary-btn full">Aggiungi spesa</button></form><div id="expenseList" class="cards-list"></div></section>
 
-      <section id="diario" class="view"><div class="page-head"><div><h1>Diario</h1><p>Traguardi, ricordi e progressi.</p></div></div><form id="diaryForm" class="panel form-grid"><label>Titolo<input id="diaryTitle" required placeholder="Prima parola"></label><label>Data<input id="diaryDate" type="date" required></label><label class="full">Racconto<textarea id="diaryText" required></textarea></label><button class="primary-btn full">Aggiungi al diario</button></form><div id="diaryList" class="cards-list"></div></section>
+      <section id="diario" class="view">
+        <div class="page-head"><div><h1>Diario</h1><p id="diarySubtitle">Traguardi, ricordi e progressi.</p></div></div>
+
+        <section id="pregnancyDiaryBox" class="pregnancy-diary hidden">
+          <div class="diary-week-card">
+            <span class="section-kicker">Diario della gravidanza</span>
+            <h2 id="diaryWeekTitle">Questa settimana</h2>
+            <p>Conservate emozioni, piccoli momenti e domande da portare al prossimo controllo.</p>
+          </div>
+          <form id="pregnancyDiaryForm" class="panel form-grid">
+            <label>Data<input id="pregDiaryDate" type="date" required></label>
+            <label>Settimana<input id="pregDiaryWeek" type="number" min="1" max="42" required></label>
+            <label>Come sta la mamma?<select id="pregDiaryMother"><option>Serena</option><option>Felice</option><option>Stanca</option><option>Preoccupata</option><option>Emozionata</option><option>Altro</option></select></label>
+            <label>Come sta il papà?<select id="pregDiaryFather"><option>Sereno</option><option>Felice</option><option>Preoccupato</option><option>Emozionato</option><option>Stanco</option><option>Altro</option></select></label>
+            <label class="full">Un momento da ricordare<textarea id="pregDiaryMemory" required placeholder="Un movimento sentito, una visita, una frase, un'emozione..."></textarea></label>
+            <label class="full">Domande per il medico<textarea id="pregDiaryQuestions" placeholder="Scrivi qui le domande da non dimenticare"></textarea></label>
+            <button class="primary-btn full">Salva questa settimana</button>
+          </form>
+          <div id="pregnancyDiaryList" class="weekly-diary-list"></div>
+        </section>
+
+        <section id="standardDiaryBox">
+          <form id="diaryForm" class="panel form-grid"><label>Titolo<input id="diaryTitle" required placeholder="Prima parola"></label><label>Data<input id="diaryDate" type="date" required></label><label class="full">Racconto<textarea id="diaryText" required></textarea></label><button class="primary-btn full">Aggiungi al diario</button></form><div id="diaryList" class="cards-list"></div>
+        </section>
+      </section>
 
       <section id="impostazioni" class="view"><div class="page-head"><div><h1>Impostazioni</h1><p>Profilo, sincronizzazione e dati.</p></div></div><div class="panel settings-panel"><button id="reloadBtn" class="soft-btn">Scarica dal Foglio Google</button><button id="installBtn" class="soft-btn hidden">Installa app</button><button id="editProfileBtn" class="soft-btn">Modifica profilo</button><button id="resetBtn" class="danger-btn">Cancella dati locali</button><p id="apiInfo" class="privacy-note"></p></div></section>
     </main>
