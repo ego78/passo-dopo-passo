@@ -31,3 +31,9 @@ Per ogni futura pubblicazione ricordarsi di cambiare il nome della cache in `ser
 - Valigia mamma, bambino, accompagnatore, documenti, casa e rientro
 - Attività personalizzate
 - Collegamento con l’Assistente Oggi
+
+
+## Correzione 2.6.1
+- cache PWA aggiornata a v261
+- numero versione corretto
+- file principali caricati con strategia network-first

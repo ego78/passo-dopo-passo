@@ -154,7 +154,7 @@ $('birthPrepForm').onsubmit=e=>{e.preventDefault();state.birthPrep=state.birthPr
 $('birthPrepFilter').onchange=renderBirthPrep;
 $('editProfileBtn').onclick=()=>{if(!state.profile)return;$('childName').value=state.profile.childName;$('familyCode').value=state.profile.familyCode;$('birthDate').value=state.profile.birthDate;$('journeyMode').value=state.profile.mode||'born';updateDateLabel();$('app').classList.add('hidden');$('onboarding').classList.remove('hidden')};$('resetBtn').onclick=()=>{if(confirm('Cancellare tutti i dati salvati su questo dispositivo?')){localStorage.removeItem('pdp_state');location.reload()}};
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').classList.remove('hidden')});$('installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null}};
-const APP_VERSION='2.5';let waitingWorker=null;let refreshing=false;
+const APP_VERSION='2.6.1';let waitingWorker=null;let refreshing=false;
 function showUpdate(worker){waitingWorker=worker;$('updateBanner')?.classList.remove('hidden')}
 async function registerUpdater(){
   if(!('serviceWorker'in navigator))return;
