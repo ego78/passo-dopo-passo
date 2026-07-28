@@ -54,3 +54,11 @@ La versione registra dati organizzativi e note. Il registro documenti non carica
 - Stato emotivo di mamma e papà
 - Ricordi e domande per il medico
 - Cronologia sincronizzata con Google Sheets
+
+
+## Versione 2.2 - Visite e controlli
+- Preparazione appuntamenti con documenti e domande
+- Specialista e struttura
+- Note dopo la visita
+- Inserimento facoltativo automatico nel calendario
+- Salvataggio locale e sincronizzazione Google Sheets

@@ -41,6 +41,7 @@
         <button class="nav-item" data-view="percorso"><span>🧭</span>Il percorso</button>
         <button class="nav-item" data-view="checklist"><span>✅</span>Checklist</button>
         <button class="nav-item" data-view="calendario"><span>📅</span>Calendario</button>
+        <button class="nav-item" data-view="visite"><span>🩺</span>Visite</button>
         <button class="nav-item" data-view="salute"><span>❤️</span>Salute e terapie</button>
         <button class="nav-item" data-view="documenti"><span>📁</span>Documenti</button>
         <button class="nav-item" data-view="scuola"><span>🎓</span>Scuola</button>
@@ -100,6 +101,25 @@
       <section id="checklist" class="view"><div class="page-head"><div><h1>Checklist</h1><p>Il percorso dalla nascita ai 18 anni.</p></div><select id="phaseFilter"><option value="all">Tutte le fasi</option><option value="gravidanza">Gravidanza</option><option value="nascita">Nascita</option><option value="0-3">0–3 anni</option><option value="3-6">3–6 anni</option><option value="6-13">6–13 anni</option><option value="14-18">14–18 anni</option></select></div><div id="journeyList" class="cards-list"></div></section>
 
       <section id="calendario" class="view"><div class="page-head"><div><h1>Calendario</h1><p>Visite, terapie e scadenze.</p></div></div><form id="deadlineForm" class="panel form-grid"><label>Titolo<input id="deadlineTitle" required placeholder="Visita cardiologica"></label><label>Data<input id="deadlineDate" type="date" required></label><label>Ora<input id="deadlineTime" type="time"></label><label>Categoria<select id="deadlineCategory"><option>Salute</option><option>Terapia</option><option>Scuola</option><option>Pratiche</option><option>Altro</option></select></label><label class="full">Note<textarea id="deadlineNotes"></textarea></label><button class="primary-btn full">Aggiungi appuntamento</button></form><div id="deadlineList" class="cards-list"></div></section>
+
+
+      <section id="visite" class="view">
+        <div class="page-head"><div><h1>Visite e controlli</h1><p>Preparate ogni appuntamento e conservate ciò che emerge dopo la visita.</p></div></div>
+        <form id="visitForm" class="panel form-grid">
+          <label>Tipo di visita<input id="visitTitle" required placeholder="Es. Morfologica o visita cardiologica"></label>
+          <label>Data<input id="visitDate" type="date" required></label>
+          <label>Ora<input id="visitTime" type="time"></label>
+          <label>Specialista<input id="visitSpecialist" placeholder="Nome o specialità"></label>
+          <label class="full">Struttura<input id="visitPlace" placeholder="Ospedale, ambulatorio o studio"></label>
+          <label class="full">Documenti da portare<textarea id="visitDocuments" placeholder="Analisi, ecografie, referti, elenco farmaci..."></textarea></label>
+          <label class="full">Domande da fare<textarea id="visitQuestions" placeholder="Scrivete qui le domande da non dimenticare"></textarea></label>
+          <label class="full">Note dopo la visita<textarea id="visitOutcome" placeholder="Indicazioni ricevute, esito, prossimo controllo..."></textarea></label>
+          <label class="check-option full"><input id="visitAddCalendar" type="checkbox" checked> Aggiungi anche al calendario</label>
+          <button class="primary-btn full">Salva visita</button>
+        </form>
+        <div id="visitList" class="visit-list"></div>
+        <p class="privacy-note">Questa sezione serve per organizzare gli appuntamenti e non sostituisce le indicazioni dei professionisti sanitari.</p>
+      </section>
 
       <section id="salute" class="view"><div class="page-head"><div><h1>Salute e terapie</h1><p>Controlli, terapie e informazioni utili.</p></div></div><form id="healthForm" class="panel form-grid"><label>Voce<input id="healthTitle" required placeholder="Logopedia"></label><label>Tipo<select id="healthType"><option>Terapia</option><option>Visita</option><option>Farmaco</option><option>Misurazione</option></select></label><label class="full">Note<textarea id="healthNotes"></textarea></label><button class="primary-btn full">Salva</button></form><div id="healthList" class="cards-list"></div></section>
 
