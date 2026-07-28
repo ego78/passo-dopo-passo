@@ -1,3 +1,12 @@
+# Passo dopo Passo 2.7.0
+
+## Novità
+- Nuova sezione **Primi passi** per accompagnare i genitori nelle settimane successive alla diagnosi prenatale.
+- Percorso guidato con sei attività essenziali, note personali e avanzamento.
+- Collegamento automatico con la Home “Oggi”.
+- Salvataggio locale e sincronizzazione nello stesso archivio Google Sheets.
+- Cache PWA aggiornata alla versione 2.7.0.
+
 # Passo dopo Passo – Versione 2.3
 
 ## Novità
