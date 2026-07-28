@@ -24,3 +24,14 @@
 
 /* Centro documenti 2.3 */
 .document-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}.doc-stat{background:#edf8f1;border:1px solid var(--border);border-radius:16px;padding:16px;text-align:center}.doc-stat.warning{background:#fff8e7}.doc-stat.alert{background:#fff0f0}.doc-stat strong{display:block;font-size:26px}.doc-stat small{color:var(--muted)}.document-list{display:grid;gap:14px}.document-card{display:flex;align-items:flex-start;gap:13px;background:#fff;border:1px solid var(--border);border-radius:17px;padding:17px;box-shadow:var(--shadow)}.document-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.document-head h3{margin:0 0 5px}.document-card p{margin:7px 0;color:var(--muted)}.document-notes{white-space:pre-wrap;background:#f7fafc;border-radius:11px;padding:11px;margin-top:10px;color:var(--muted)}.badge.doc-manca{background:#fff0f0;color:#a53a3a}.badge.doc-da-aggiornare{background:#fff8e7;color:#8c6414}.badge.doc-completo{background:#edf8f1;color:#287442}@media(max-width:600px){.document-summary{grid-template-columns:repeat(3,1fr);gap:7px}.doc-stat{padding:11px 5px}.doc-stat strong{font-size:21px}.doc-stat small{font-size:10px}.document-card{padding:13px;gap:9px}.document-head{display:block}.document-head .badge{margin-top:7px}}
+
+
+/* Versione 2.4 - Assistente Oggi */
+.today-assistant{margin:18px 0;padding:22px;border-radius:24px;background:linear-gradient(135deg,#fff7ed,#fff);border:1px solid #f4ddc6;box-shadow:0 10px 30px rgba(101,74,55,.08)}
+.today-assistant-head,.today-assistant-footer{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.today-assistant-head h2{margin:4px 0 0;font-size:1.45rem}
+.today-assistant-message{font-size:1.03rem;line-height:1.6;margin:16px 0;color:var(--text)}
+.today-assistant-details{display:grid;gap:8px;padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.76);border:1px solid rgba(244,221,198,.8);margin-bottom:16px}
+.today-assistant-details div{line-height:1.45}
+.today-assistant-footer small{color:var(--muted)}
+@media(max-width:640px){.today-assistant{padding:18px}.today-assistant-head,.today-assistant-footer{align-items:flex-start;flex-direction:column}.today-assistant-footer .primary-btn{width:100%}}

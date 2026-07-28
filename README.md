@@ -12,3 +12,7 @@
 Il progetto continua a usare il medesimo salvataggio locale e la sincronizzazione Google Sheets. Non è necessario modificare Code.gs.
 
 Prima di pubblicare, conservare in config.js il proprio URL Apps Script terminante in /exec.
+
+
+## Versione 2.4 – Assistente Oggi
+La dashboard analizza visite future, documenti mancanti, diario della gravidanza e checklist per proporre automaticamente una sola azione prioritaria. Il pulsante “Iniziamo” apre direttamente la sezione corretta.
