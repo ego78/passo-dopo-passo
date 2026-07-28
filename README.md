@@ -50,3 +50,11 @@ Per ogni futura pubblicazione ricordarsi di cambiare il nome della cache in `ser
 
 ## Versione 2.8.0
 Aggiunta Biblioteca intelligente con ricerca, categorie, preferiti, guide disponibili offline e suggerimenti automatici nella Dashboard.
+
+
+## Versione 2.9.0 – Assistente del percorso
+- assistente locale contestuale basato sui dati salvati
+- ricerca globale in visite, documenti, calendario, diario, checklist e biblioteca
+- preparazione automatica della prossima visita
+- pulsante ✨ nelle schede visita
+- nessuna chiave API esposta nel browser
