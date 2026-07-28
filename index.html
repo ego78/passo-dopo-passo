@@ -170,10 +170,14 @@
         </section>
       </section>
 
-      <section id="impostazioni" class="view"><div class="page-head"><div><h1>Impostazioni</h1><p>Profilo, sincronizzazione e dati.</p></div></div><div class="panel settings-panel"><button id="reloadBtn" class="soft-btn">Scarica dal Foglio Google</button><button id="installBtn" class="soft-btn hidden">Installa app</button><button id="editProfileBtn" class="soft-btn">Modifica profilo</button><button id="resetBtn" class="danger-btn">Cancella dati locali</button><p id="apiInfo" class="privacy-note"></p></div></section>
+      <section id="impostazioni" class="view"><div class="page-head"><div><h1>Impostazioni</h1><p>Profilo, sincronizzazione e dati.</p></div></div><div class="panel settings-panel"><button id="reloadBtn" class="soft-btn">Scarica dal Foglio Google</button><button id="installBtn" class="soft-btn hidden">Installa app</button><button id="editProfileBtn" class="soft-btn">Modifica profilo</button><button id="resetBtn" class="danger-btn">Cancella dati locali</button><div class="version-info"><span>Versione installata</span><strong id="appVersion">2.5</strong><button id="checkUpdateBtn" class="soft-btn">Controlla aggiornamenti</button></div><p id="apiInfo" class="privacy-note"></p></div></section>
     </main>
 
     <nav class="bottom-nav"><button class="active" data-view="dashboard">🏠<small>Home</small></button><button data-view="percorso">🧭<small>Percorso</small></button><button id="bottomSync">🔄<small>Sincronizza</small></button><button data-view="impostazioni">👤<small>Profilo</small></button></nav>
+    <div id="updateBanner" class="update-banner hidden" role="status" aria-live="polite">
+      <div><strong>Nuova versione disponibile</strong><small>L’aggiornamento è pronto e non cancellerà i tuoi dati.</small></div>
+      <div class="update-actions"><button id="updateLaterBtn" class="soft-btn">Più tardi</button><button id="applyUpdateBtn" class="primary-btn">Aggiorna adesso</button></div>
+    </div>
   </div>
 
   <script src="config.js"></script><script src="app.js"></script>

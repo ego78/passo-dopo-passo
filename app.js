@@ -121,6 +121,27 @@ $('expenseForm').onsubmit=e=>{e.preventDefault();state.expenses.push({id:uid(),t
 $('diaryForm').onsubmit=e=>{e.preventDefault();state.diary.push({id:uid(),title:$('diaryTitle').value.trim(),date:$('diaryDate').value,text:$('diaryText').value.trim()});e.target.reset();persist()};
 $('pregnancyDiaryForm').onsubmit=e=>{e.preventDefault();state.pregnancyNotes=state.pregnancyNotes||[];state.pregnancyNotes.push({id:uid(),date:$('pregDiaryDate').value,week:Number($('pregDiaryWeek').value),motherMood:$('pregDiaryMother').value,fatherMood:$('pregDiaryFather').value,memory:$('pregDiaryMemory').value.trim(),questions:$('pregDiaryQuestions').value.trim()});e.target.reset();$('pregDiaryDate').value=new Date().toISOString().slice(0,10);$('pregDiaryWeek').value=pregnancyInfo(state.profile.birthDate).week;persist();};
 $('editProfileBtn').onclick=()=>{if(!state.profile)return;$('childName').value=state.profile.childName;$('familyCode').value=state.profile.familyCode;$('birthDate').value=state.profile.birthDate;$('journeyMode').value=state.profile.mode||'born';updateDateLabel();$('app').classList.add('hidden');$('onboarding').classList.remove('hidden')};$('resetBtn').onclick=()=>{if(confirm('Cancellare tutti i dati salvati su questo dispositivo?')){localStorage.removeItem('pdp_state');location.reload()}};
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').classList.remove('hidden')});$('installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null}};if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));window.addEventListener('online',()=>syncToGoogle(false));window.addEventListener('offline',()=>setSyncStatus('Offline: copia locale','error'));
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').classList.remove('hidden')});$('installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null}};
+const APP_VERSION='2.5';let waitingWorker=null;let refreshing=false;
+function showUpdate(worker){waitingWorker=worker;$('updateBanner')?.classList.remove('hidden')}
+async function registerUpdater(){
+  if(!('serviceWorker'in navigator))return;
+  try{
+    const registration=await navigator.serviceWorker.register('service-worker.js',{updateViaCache:'none'});
+    if(registration.waiting&&navigator.serviceWorker.controller)showUpdate(registration.waiting);
+    registration.addEventListener('updatefound',()=>{
+      const worker=registration.installing;if(!worker)return;
+      worker.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate(worker)});
+    });
+    $('checkUpdateBtn').onclick=async()=>{const btn=$('checkUpdateBtn');btn.disabled=true;btn.textContent='Controllo…';try{await registration.update();if(!registration.waiting)btn.textContent='App aggiornata'}catch(e){btn.textContent='Controllo non riuscito'}setTimeout(()=>{btn.disabled=false;btn.textContent='Controlla aggiornamenti'},1800)};
+    setInterval(()=>registration.update().catch(()=>{}),60*60*1000);
+  }catch(e){console.warn('Aggiornamento PWA non disponibile',e)}
+}
+$('appVersion').textContent=APP_VERSION;
+$('applyUpdateBtn').onclick=()=>{if(waitingWorker){$('applyUpdateBtn').disabled=true;$('applyUpdateBtn').textContent='Aggiornamento…';waitingWorker.postMessage({type:'SKIP_WAITING'})}};
+$('updateLaterBtn').onclick=()=>$('updateBanner').classList.add('hidden');
+navigator.serviceWorker?.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload()});
+window.addEventListener('load',registerUpdater);
+window.addEventListener('online',()=>syncToGoogle(false));window.addEventListener('offline',()=>setSyncStatus('Offline: copia locale','error'));
 function updateDateLabel(){const preg=$('journeyMode').value==='pregnancy';$('birthDateLabel').childNodes[0].nodeValue=preg?'Data presunta del parto':'Data di nascita'}$('journeyMode').onchange=updateDateLabel;updateDateLabel();
 renderAll();if(state.profile){setSyncStatus(apiConfigured()?'Google collegato':'Configura Apps Script',apiConfigured()?'ok':'error');loadFromGoogle(false)}
