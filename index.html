@@ -44,6 +44,7 @@
         <button class="nav-item" data-view="visite"><span>🩺</span>Visite</button>
         <button class="nav-item" data-view="preparazione"><span>🧳</span>Prepariamoci</button>
         <button class="nav-item" data-view="diagnosi"><span>🤝</span>Primi passi</button>
+        <button class="nav-item" data-view="biblioteca"><span>📚</span>Impariamo insieme</button>
         <button class="nav-item" data-view="salute"><span>❤️</span>Salute e terapie</button>
         <button class="nav-item" data-view="documenti"><span>📁</span>Documenti</button>
         <button class="nav-item" data-view="scuola"><span>🎓</span>Scuola</button>
@@ -101,8 +102,10 @@
           <button data-view-target="documenti"><span>📄</span><small>Documento</small></button>
           <button data-view-target="salute"><span>❤️</span><small>Salute</small></button>
           <button data-view-target="diario"><span>⭐</span><small>Traguardo</small></button>
+          <button data-view-target="biblioteca"><span>📚</span><small>Guide</small></button>
         </section>
 
+        <section id="recommendedGuide" class="panel recommended-guide"><div><span class="section-kicker">Lettura consigliata</span><h3 id="recommendedGuideTitle">Una guida per questo momento</h3><p id="recommendedGuideText"></p></div><button id="recommendedGuideBtn" class="soft-btn">Apri guida</button></section>
         <div class="dashboard-grid">
           <section class="panel today-panel"><div class="panel-title"><div><span class="section-kicker">Priorità</span><h3>Attività da fare</h3></div><button class="link-btn" data-view-target="checklist">Vedi tutte</button></div><div id="todayList" class="compact-list"></div></section>
           <section class="panel appointments-panel"><div class="panel-title"><h3>Prossimi appuntamenti</h3><button class="link-btn" data-view-target="calendario">Vedi tutti</button></div><div id="nextAppointments" class="compact-list"></div></section>
@@ -153,6 +156,18 @@
         <div class="panel prep-progress-panel"><div class="progress-head"><strong>Il vostro percorso</strong><span id="diagnosisProgressText">0 passi completati</span></div><div class="progress-track"><span id="diagnosisProgress"></span></div></div>
         <div id="diagnosisSupportList" class="support-steps"></div>
         <div class="panel gentle-note"><strong>Da ricordare</strong><p>È normale avere emozioni diverse, anche contrastanti. Potete tornare su questi passi quando vi sentite pronti.</p></div>
+      </section>
+
+      <section id="biblioteca" class="view">
+        <div class="page-head"><div><h1>Impariamo insieme</h1><p>Guide brevi, semplici e collegate al momento che state vivendo.</p></div></div>
+        <div class="library-toolbar panel">
+          <label class="library-search">Cerca una guida<input id="librarySearch" type="search" placeholder="Es. cuore, morfologica, 104, allattamento"></label>
+          <label>Categoria<select id="libraryCategory"><option value="all">Tutte le categorie</option><option>Gravidanza</option><option>Primi passi</option><option>Salute</option><option>Primi mesi</option><option>Agevolazioni</option><option>Vita quotidiana</option></select></label>
+          <label class="check-option"><input id="libraryFavoritesOnly" type="checkbox"> Solo preferiti</label>
+        </div>
+        <div id="libraryStats" class="library-stats"></div>
+        <div id="libraryList" class="library-grid"></div>
+        <p class="privacy-note">Le guide hanno finalità informative e organizzative. Non sostituiscono il parere dei professionisti sanitari o degli enti competenti.</p>
       </section>
 
       <section id="salute" class="view"><div class="page-head"><div><h1>Salute e terapie</h1><p>Controlli, terapie e informazioni utili.</p></div></div><form id="healthForm" class="panel form-grid"><label>Voce<input id="healthTitle" required placeholder="Logopedia"></label><label>Tipo<select id="healthType"><option>Terapia</option><option>Visita</option><option>Farmaco</option><option>Misurazione</option></select></label><label class="full">Note<textarea id="healthNotes"></textarea></label><button class="primary-btn full">Salva</button></form><div id="healthList" class="cards-list"></div></section>

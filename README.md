@@ -46,3 +46,7 @@ Per ogni futura pubblicazione ricordarsi di cambiare il nome della cache in `ser
 - cache PWA aggiornata a v261
 - numero versione corretto
 - file principali caricati con strategia network-first
+
+
+## Versione 2.8.0
+Aggiunta Biblioteca intelligente con ricerca, categorie, preferiti, guide disponibili offline e suggerimenti automatici nella Dashboard.
