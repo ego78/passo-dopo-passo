@@ -16,11 +16,12 @@
     <div class="onboarding-card">
       <img src="logo-square.png" alt="Logo Passo dopo Passo" class="onboarding-logo">
       <h1>Passo dopo Passo</h1>
-      <p>Il tuo compagno di viaggio dalla nascita ai 18 anni.</p>
+      <p>Il tuo compagno di viaggio dalla gravidanza ai 18 anni.</p>
       <form id="profileForm" class="form-stack">
-        <label>Nome del bambino<input id="childName" required placeholder="Es. Lorenzo"></label>
+        <label>Nome del bambino <small>(anche provvisorio)</small><input id="childName" required placeholder="Es. Lorenzo"></label>
+        <label>Il bambino è già nato?<select id="journeyMode"><option value="pregnancy">No, siamo in attesa</option><option value="born">Sì, è già nato</option></select></label>
         <label>Codice famiglia<input id="familyCode" required minlength="6" placeholder="Es. FAM7K29X"></label>
-        <label>Data di nascita prevista o effettiva<input id="birthDate" type="date" required></label>
+        <label id="birthDateLabel">Data presunta del parto<input id="birthDate" type="date" required></label>
         <button type="submit" class="primary-btn">Entra nell'app</button>
       </form>
       <small>Usa lo stesso codice famiglia su tutti i dispositivi.</small>
@@ -37,6 +38,7 @@
       <div class="brand desktop-brand"><img src="logo-square.png" alt=""><strong>Passo<br>dopo Passo</strong></div>
       <nav id="mainNav" class="main-nav">
         <button class="nav-item active" data-view="dashboard"><span>🏠</span>Dashboard</button>
+        <button class="nav-item" data-view="percorso"><span>🧭</span>Il percorso</button>
         <button class="nav-item" data-view="checklist"><span>✅</span>Checklist</button>
         <button class="nav-item" data-view="calendario"><span>📅</span>Calendario</button>
         <button class="nav-item" data-view="salute"><span>❤️</span>Salute e terapie</button>
@@ -66,6 +68,11 @@
           <img src="child-avatar.png" alt="" class="welcome-child">
         </div>
 
+        <section id="pregnancyHero" class="pregnancy-hero hidden">
+          <div class="pregnancy-main"><span class="section-kicker">Oggi siete qui</span><h2 id="pregnancyWeek">Settimana di gravidanza</h2><p id="pregnancyCountdown"></p><div class="pregnancy-track"><div id="pregnancyBar" class="pregnancy-bar"></div></div><small id="pregnancyProgressText"></small></div>
+          <div class="next-step-card"><span>Prossimo passo</span><strong id="nextStepTitle">Prepariamo il prossimo controllo</strong><small id="nextStepMeta"></small><button id="startNextStep" class="primary-btn">Iniziamo</button></div>
+        </section>
+
         <section class="overview-grid" aria-label="Riepilogo del profilo">
           <article class="metric-card"><span class="metric-icon">✅</span><div><strong id="metricCompleted">0</strong><small>attività completate</small></div></article>
           <article class="metric-card"><span class="metric-icon">📅</span><div><strong id="metricAppointments">0</strong><small>appuntamenti futuri</small></div></article>
@@ -88,7 +95,9 @@
         </div>
       </section>
 
-      <section id="checklist" class="view"><div class="page-head"><div><h1>Checklist</h1><p>Il percorso dalla nascita ai 18 anni.</p></div><select id="phaseFilter"><option value="all">Tutte le fasi</option><option value="nascita">Nascita</option><option value="0-3">0–3 anni</option><option value="3-6">3–6 anni</option><option value="6-13">6–13 anni</option><option value="14-18">14–18 anni</option></select></div><div id="journeyList" class="cards-list"></div></section>
+      <section id="percorso" class="view"><div class="page-head"><div><h1>Il nostro percorso</h1><p id="journeySubtitle">Un passo alla volta.</p></div></div><div id="journeyTimeline" class="timeline"></div></section>
+
+      <section id="checklist" class="view"><div class="page-head"><div><h1>Checklist</h1><p>Il percorso dalla nascita ai 18 anni.</p></div><select id="phaseFilter"><option value="all">Tutte le fasi</option><option value="gravidanza">Gravidanza</option><option value="nascita">Nascita</option><option value="0-3">0–3 anni</option><option value="3-6">3–6 anni</option><option value="6-13">6–13 anni</option><option value="14-18">14–18 anni</option></select></div><div id="journeyList" class="cards-list"></div></section>
 
       <section id="calendario" class="view"><div class="page-head"><div><h1>Calendario</h1><p>Visite, terapie e scadenze.</p></div></div><form id="deadlineForm" class="panel form-grid"><label>Titolo<input id="deadlineTitle" required placeholder="Visita cardiologica"></label><label>Data<input id="deadlineDate" type="date" required></label><label>Ora<input id="deadlineTime" type="time"></label><label>Categoria<select id="deadlineCategory"><option>Salute</option><option>Terapia</option><option>Scuola</option><option>Pratiche</option><option>Altro</option></select></label><label class="full">Note<textarea id="deadlineNotes"></textarea></label><button class="primary-btn full">Aggiungi appuntamento</button></form><div id="deadlineList" class="cards-list"></div></section>
 
@@ -107,7 +116,7 @@
       <section id="impostazioni" class="view"><div class="page-head"><div><h1>Impostazioni</h1><p>Profilo, sincronizzazione e dati.</p></div></div><div class="panel settings-panel"><button id="reloadBtn" class="soft-btn">Scarica dal Foglio Google</button><button id="installBtn" class="soft-btn hidden">Installa app</button><button id="editProfileBtn" class="soft-btn">Modifica profilo</button><button id="resetBtn" class="danger-btn">Cancella dati locali</button><p id="apiInfo" class="privacy-note"></p></div></section>
     </main>
 
-    <nav class="bottom-nav"><button class="active" data-view="dashboard">🏠<small>Home</small></button><button data-view="calendario">🔔<small>Scadenze</small></button><button id="bottomSync">🔄<small>Sincronizza</small></button><button data-view="impostazioni">👤<small>Profilo</small></button></nav>
+    <nav class="bottom-nav"><button class="active" data-view="dashboard">🏠<small>Home</small></button><button data-view="percorso">🧭<small>Percorso</small></button><button id="bottomSync">🔄<small>Sincronizza</small></button><button data-view="impostazioni">👤<small>Profilo</small></button></nav>
   </div>
 
   <script src="config.js"></script><script src="app.js"></script>
