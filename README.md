@@ -40,3 +40,10 @@ Quando sostituisci i file su GitHub, il service worker potrebbe mantenere per po
 ## Privacy
 
 La versione registra dati organizzativi e note. Il registro documenti non carica ancora i file sanitari veri e propri. Prima di offrire il servizio pubblicamente a più famiglie è necessario aggiungere autenticazione, informativa privacy, gestione del consenso e adeguate misure di sicurezza.
+
+## Aggiornamento dashboard 1.1
+
+- Riepilogo numerico immediato
+- Azioni rapide
+- Priorità evidenziate
+- Migliore esperienza mobile

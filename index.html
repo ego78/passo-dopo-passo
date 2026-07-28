@@ -66,8 +66,22 @@
           <img src="child-avatar.png" alt="" class="welcome-child">
         </div>
 
+        <section class="overview-grid" aria-label="Riepilogo del profilo">
+          <article class="metric-card"><span class="metric-icon">✅</span><div><strong id="metricCompleted">0</strong><small>attività completate</small></div></article>
+          <article class="metric-card"><span class="metric-icon">📅</span><div><strong id="metricAppointments">0</strong><small>appuntamenti futuri</small></div></article>
+          <article class="metric-card"><span class="metric-icon">📄</span><div><strong id="metricDocuments">0</strong><small>documenti registrati</small></div></article>
+          <article class="metric-card"><span class="metric-icon">🎁</span><div><strong id="metricBenefits">0</strong><small>agevolazioni concluse</small></div></article>
+        </section>
+
+        <section class="quick-actions" aria-label="Azioni rapide">
+          <button data-view-target="calendario"><span>＋</span><small>Appuntamento</small></button>
+          <button data-view-target="documenti"><span>📄</span><small>Documento</small></button>
+          <button data-view-target="salute"><span>❤️</span><small>Salute</small></button>
+          <button data-view-target="diario"><span>⭐</span><small>Traguardo</small></button>
+        </section>
+
         <div class="dashboard-grid">
-          <section class="panel today-panel"><div class="panel-title"><h3>Attività di oggi</h3><button class="link-btn" data-view-target="checklist">Vedi tutte</button></div><div id="todayList" class="compact-list"></div></section>
+          <section class="panel today-panel"><div class="panel-title"><div><span class="section-kicker">Priorità</span><h3>Attività da fare</h3></div><button class="link-btn" data-view-target="checklist">Vedi tutte</button></div><div id="todayList" class="compact-list"></div></section>
           <section class="panel appointments-panel"><div class="panel-title"><h3>Prossimi appuntamenti</h3><button class="link-btn" data-view-target="calendario">Vedi tutti</button></div><div id="nextAppointments" class="compact-list"></div></section>
           <section class="panel progress-panel"><div class="panel-title"><h3>Checklist in corso</h3><button class="link-btn" data-view-target="checklist">Vedi tutte</button></div><div id="progressList"></div></section>
           <section class="panel docs-panel"><div class="panel-title"><h3>Ultimi documenti</h3><button class="link-btn" data-view-target="documenti">Vedi tutti</button></div><div id="recentDocs" class="doc-row"></div></section>
