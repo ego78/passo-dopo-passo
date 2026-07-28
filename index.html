@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Passo dopo Passo, assistente familiare dalla nascita ai 18 anni.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Passo dopo Passo</title>
+</head>
+<body>
+  <section id="onboarding" class="onboarding hidden">
+    <div class="onboarding-card">
+      <img src="logo-square.png" alt="Logo Passo dopo Passo" class="onboarding-logo">
+      <h1>Passo dopo Passo</h1>
+      <p>Il tuo compagno di viaggio dalla nascita ai 18 anni.</p>
+      <form id="profileForm" class="form-stack">
+        <label>Nome del bambino<input id="childName" required placeholder="Es. Lorenzo"></label>
+        <label>Codice famiglia<input id="familyCode" required minlength="6" placeholder="Es. FAM7K29X"></label>
+        <label>Data di nascita prevista o effettiva<input id="birthDate" type="date" required></label>
+        <button type="submit" class="primary-btn">Entra nell'app</button>
+      </form>
+      <small>Usa lo stesso codice famiglia su tutti i dispositivi.</small>
+    </div>
+  </section>
+
+  <div id="app" class="app-shell hidden">
+    <header class="mobile-header">
+      <div class="brand"><img src="logo-square.png" alt=""><strong>Passo<br>dopo Passo</strong></div>
+      <div class="header-actions"><span id="syncDot" class="sync-dot"></span><button id="menuBtn" class="icon-button" aria-label="Apri menu">☰</button></div>
+    </header>
+
+    <aside id="sidebar" class="sidebar">
+      <div class="brand desktop-brand"><img src="logo-square.png" alt=""><strong>Passo<br>dopo Passo</strong></div>
+      <nav id="mainNav" class="main-nav">
+        <button class="nav-item active" data-view="dashboard"><span>🏠</span>Dashboard</button>
+        <button class="nav-item" data-view="checklist"><span>✅</span>Checklist</button>
+        <button class="nav-item" data-view="calendario"><span>📅</span>Calendario</button>
+        <button class="nav-item" data-view="salute"><span>❤️</span>Salute e terapie</button>
+        <button class="nav-item" data-view="documenti"><span>📁</span>Documenti</button>
+        <button class="nav-item" data-view="scuola"><span>🎓</span>Scuola</button>
+        <button class="nav-item" data-view="agevolazioni"><span>🎁</span>Agevolazioni</button>
+        <button class="nav-item" data-view="spese"><span>👛</span>Spese</button>
+        <button class="nav-item" data-view="diario"><span>📘</span>Diario</button>
+        <button class="nav-item" data-view="impostazioni"><span>⚙️</span>Impostazioni</button>
+      </nav>
+      <div class="sidebar-footer">
+        <span id="syncStatus">Solo dispositivo</span>
+        <button id="syncBtn" class="soft-btn">Sincronizza</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section id="dashboard" class="view active-view">
+        <div class="profile-card">
+          <img src="child-avatar.png" alt="Avatar del bambino" class="avatar">
+          <div><h2 id="profileName">Lorenzo</h2><p id="profileAge"></p><small id="profileBirth"></small></div>
+          <button class="soft-btn edit-profile" data-view-target="impostazioni">Modifica</button>
+        </div>
+
+        <div class="welcome-card">
+          <div><h1 id="welcomeText">Ciao, famiglia! 👋</h1><p>Ecco cosa c'è da fare oggi.</p></div>
+          <img src="child-avatar.png" alt="" class="welcome-child">
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel today-panel"><div class="panel-title"><h3>Attività di oggi</h3><button class="link-btn" data-view-target="checklist">Vedi tutte</button></div><div id="todayList" class="compact-list"></div></section>
+          <section class="panel appointments-panel"><div class="panel-title"><h3>Prossimi appuntamenti</h3><button class="link-btn" data-view-target="calendario">Vedi tutti</button></div><div id="nextAppointments" class="compact-list"></div></section>
+          <section class="panel progress-panel"><div class="panel-title"><h3>Checklist in corso</h3><button class="link-btn" data-view-target="checklist">Vedi tutte</button></div><div id="progressList"></div></section>
+          <section class="panel docs-panel"><div class="panel-title"><h3>Ultimi documenti</h3><button class="link-btn" data-view-target="documenti">Vedi tutti</button></div><div id="recentDocs" class="doc-row"></div></section>
+        </div>
+      </section>
+
+      <section id="checklist" class="view"><div class="page-head"><div><h1>Checklist</h1><p>Il percorso dalla nascita ai 18 anni.</p></div><select id="phaseFilter"><option value="all">Tutte le fasi</option><option value="nascita">Nascita</option><option value="0-3">0–3 anni</option><option value="3-6">3–6 anni</option><option value="6-13">6–13 anni</option><option value="14-18">14–18 anni</option></select></div><div id="journeyList" class="cards-list"></div></section>
+
+      <section id="calendario" class="view"><div class="page-head"><div><h1>Calendario</h1><p>Visite, terapie e scadenze.</p></div></div><form id="deadlineForm" class="panel form-grid"><label>Titolo<input id="deadlineTitle" required placeholder="Visita cardiologica"></label><label>Data<input id="deadlineDate" type="date" required></label><label>Ora<input id="deadlineTime" type="time"></label><label>Categoria<select id="deadlineCategory"><option>Salute</option><option>Terapia</option><option>Scuola</option><option>Pratiche</option><option>Altro</option></select></label><label class="full">Note<textarea id="deadlineNotes"></textarea></label><button class="primary-btn full">Aggiungi appuntamento</button></form><div id="deadlineList" class="cards-list"></div></section>
+
+      <section id="salute" class="view"><div class="page-head"><div><h1>Salute e terapie</h1><p>Controlli, terapie e informazioni utili.</p></div></div><form id="healthForm" class="panel form-grid"><label>Voce<input id="healthTitle" required placeholder="Logopedia"></label><label>Tipo<select id="healthType"><option>Terapia</option><option>Visita</option><option>Farmaco</option><option>Misurazione</option></select></label><label class="full">Note<textarea id="healthNotes"></textarea></label><button class="primary-btn full">Salva</button></form><div id="healthList" class="cards-list"></div></section>
+
+      <section id="documenti" class="view"><div class="page-head"><div><h1>Documenti</h1><p>Registro dei documenti importanti.</p></div></div><form id="documentForm" class="panel inline-form"><input id="documentName" required placeholder="Es. Verbale Legge 104"><select id="documentCategory"><option>INPS</option><option>Sanità</option><option>Scuola</option><option>Fiscale</option><option>Altro</option></select><button class="primary-btn">Aggiungi</button></form><div id="documentList" class="cards-list"></div><p class="privacy-note">Questa versione registra nome, categoria e stato del documento; non carica ancora il file sanitario.</p></section>
+
+      <section id="scuola" class="view"><div class="page-head"><div><h1>Scuola</h1><p>PEI, sostegno, incontri e obiettivi.</p></div></div><form id="schoolForm" class="panel form-grid"><label>Attività<input id="schoolTitle" required placeholder="Incontro GLO"></label><label>Anno scolastico<input id="schoolYear" placeholder="2026/2027"></label><label class="full">Note<textarea id="schoolNotes"></textarea></label><button class="primary-btn full">Salva</button></form><div id="schoolList" class="cards-list"></div></section>
+
+      <section id="agevolazioni" class="view"><div class="page-head"><div><h1>Agevolazioni</h1><p>Pratiche e richieste da seguire.</p></div></div><div id="benefitsList" class="cards-list"></div></section>
+
+      <section id="spese" class="view"><div class="page-head"><div><h1>Spese</h1><p>Costi sanitari, scolastici e detraibili.</p></div><div class="total-chip">Totale: <strong id="expenseTotal">€ 0,00</strong></div></div><form id="expenseForm" class="panel form-grid"><label>Descrizione<input id="expenseTitle" required placeholder="Visita specialistica"></label><label>Importo (€)<input id="expenseAmount" type="number" min="0" step="0.01" required></label><label>Data<input id="expenseDate" type="date" required></label><label>Categoria<select id="expenseCategory"><option>Sanità</option><option>Terapie</option><option>Scuola</option><option>Trasporti</option><option>Altro</option></select></label><button class="primary-btn full">Aggiungi spesa</button></form><div id="expenseList" class="cards-list"></div></section>
+
+      <section id="diario" class="view"><div class="page-head"><div><h1>Diario</h1><p>Traguardi, ricordi e progressi.</p></div></div><form id="diaryForm" class="panel form-grid"><label>Titolo<input id="diaryTitle" required placeholder="Prima parola"></label><label>Data<input id="diaryDate" type="date" required></label><label class="full">Racconto<textarea id="diaryText" required></textarea></label><button class="primary-btn full">Aggiungi al diario</button></form><div id="diaryList" class="cards-list"></div></section>
+
+      <section id="impostazioni" class="view"><div class="page-head"><div><h1>Impostazioni</h1><p>Profilo, sincronizzazione e dati.</p></div></div><div class="panel settings-panel"><button id="reloadBtn" class="soft-btn">Scarica dal Foglio Google</button><button id="installBtn" class="soft-btn hidden">Installa app</button><button id="editProfileBtn" class="soft-btn">Modifica profilo</button><button id="resetBtn" class="danger-btn">Cancella dati locali</button><p id="apiInfo" class="privacy-note"></p></div></section>
+    </main>
+
+    <nav class="bottom-nav"><button class="active" data-view="dashboard">🏠<small>Home</small></button><button data-view="calendario">🔔<small>Scadenze</small></button><button id="bottomSync">🔄<small>Sincronizza</small></button><button data-view="impostazioni">👤<small>Profilo</small></button></nav>
+  </div>
+
+  <script src="config.js"></script><script src="app.js"></script>
+</body>
+</html>
