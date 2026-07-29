@@ -1,4 +1,4 @@
-const CACHE = 'passo-dopo-passo-v280';
+const CACHE = 'passo-dopo-passo-v300';
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './config.js',
   './manifest.json', './logo-square.png', './child-avatar.png',
