@@ -1,32 +1,21 @@
-# Passo dopo Passo — Versione 3.0.0
+# Passo dopo Passo 3.1.1
 
-## Novità: Archivio documenti e referti
+## Novità
+- Estrazione automatica del testo da PDF e fotografie.
+- Salvataggio del file originale nella cartella privata Google Drive `Passo dopo Passo - Documenti`.
+- Sottocartella separata per ogni codice famiglia.
+- Nuovo foglio `Documenti` con nome file, tipo, dimensione e collegamento Drive.
+- Copia locale mantenuta sul dispositivo per l'uso rapido e offline.
 
-La versione 3.0 aggiunge al Centro documenti:
+## Aggiornamento obbligatorio di Apps Script
+1. Apri il Foglio Google collegato e vai in **Estensioni → Apps Script**.
+2. Sostituisci completamente il vecchio `Code.gs` con quello incluso nello ZIP.
+3. Salva ed esegui manualmente una volta la funzione `setup`.
+4. Accetta le autorizzazioni richieste per Fogli Google e Google Drive.
+5. Vai in **Esegui il deployment → Gestisci deployment**.
+6. Modifica il deployment esistente, scegli **Nuova versione** e distribuisci.
+7. Mantieni in `config.js` l'indirizzo `/exec` del deployment.
 
-- caricamento locale di PDF, immagini e file di testo;
-- apertura e anteprima dei file salvati;
-- testo del referto associato al documento;
-- lettura guidata che organizza sintesi, indicazioni da verificare, date e termini da chiedere al medico;
-- collegamento del documento alle visite già registrate;
-- ricerca globale anche nel testo associato ai documenti.
+I file vengono creati come privati nell'account Google che possiede lo script. Non impostare la cartella come pubblica.
 
-## Privacy
-
-I file vengono conservati nell'archivio IndexedDB del browser sul dispositivo utilizzato. Non vengono inviati a Google Sheets. I dati descrittivi e il testo incollato possono invece rientrare nella normale sincronizzazione configurata dall'utente.
-
-La lettura guidata non interpreta clinicamente il referto, non formula diagnosi e non sostituisce il professionista sanitario.
-
-## Installazione
-
-1. Estrarre tutti i file dello ZIP.
-2. Conservare in `config.js` l'indirizzo `/exec` della propria Web App Apps Script.
-3. Caricare e sostituire tutti i file nel repository GitHub Pages.
-4. Eseguire il commit.
-5. Aprire l'app e scegliere **Aggiorna adesso**.
-
-Nelle Impostazioni deve comparire la versione `3.0.0`.
-
-## Nota sui file
-
-I file locali non passano automaticamente da un telefono a un altro. Per la futura sincronizzazione cloud protetta sarà necessario un servizio di archiviazione con autenticazione e regole specifiche per dati sanitari.
+Limite consigliato per singolo file: 8 MB.
