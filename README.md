@@ -1,21 +1,24 @@
-# Passo dopo Passo 3.1.1
+# Passo dopo Passo 3.3 — Professional UX e profili familiari
 
 ## Novità
-- Estrazione automatica del testo da PDF e fotografie.
-- Salvataggio del file originale nella cartella privata Google Drive `Passo dopo Passo - Documenti`.
-- Sottocartella separata per ogni codice famiglia.
-- Nuovo foglio `Documenti` con nome file, tipo, dimensione e collegamento Drive.
-- Copia locale mantenuta sul dispositivo per l'uso rapido e offline.
 
-## Aggiornamento obbligatorio di Apps Script
-1. Apri il Foglio Google collegato e vai in **Estensioni → Apps Script**.
-2. Sostituisci completamente il vecchio `Code.gs` con quello incluso nello ZIP.
-3. Salva ed esegui manualmente una volta la funzione `setup`.
-4. Accetta le autorizzazioni richieste per Fogli Google e Google Drive.
-5. Vai in **Esegui il deployment → Gestisci deployment**.
-6. Modifica il deployment esistente, scegli **Nuova versione** e distribuisci.
-7. Mantieni in `config.js` l'indirizzo `/exec` del deployment.
+- Menu laterale realmente scrollabile con testata e footer fissi.
+- Voci raggruppate e menu dinamico tra gravidanza e post-nascita.
+- Badge per appuntamenti, visite, documenti e checklist.
+- Ricerca rapida delle sezioni.
+- Bottom bar a 5 pulsanti e menu rapido “Aggiungi”.
+- Tema chiaro, scuro o automatico.
+- Testo grande, contrasto elevato e icone grandi.
+- Profili familiari con ruoli e livelli di accesso.
+- Cache PWA aggiornata alla versione 3.3.0.
 
-I file vengono creati come privati nell'account Google che possiede lo script. Non impostare la cartella come pubblica.
+## Importante sui profili familiari
 
-Limite consigliato per singolo file: 8 MB.
+I profili Mamma, Papà, Nonni e caregiver sono collegati allo stesso codice famiglia e vengono sincronizzati con il resto dei dati. Non sono ancora account autenticati con password: il livello “solo lettura” è organizzativo, non una protezione di sicurezza completa.
+
+## Aggiornamento
+
+1. Conservare il proprio URL Apps Script in `config.js`.
+2. Caricare tutti i file su GitHub.
+3. Premere “Aggiorna adesso” nella web app.
+4. Non è necessario sostituire `Code.gs` rispetto alla 3.1.1.

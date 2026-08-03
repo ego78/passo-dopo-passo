@@ -34,29 +34,44 @@
       <div class="header-actions"><span id="syncDot" class="sync-dot"></span><button id="menuBtn" class="icon-button" aria-label="Apri menu">☰</button></div>
     </header>
 
-    <aside id="sidebar" class="sidebar">
-      <div class="brand desktop-brand"><img src="logo-square.png" alt=""><strong>Passo<br>dopo Passo</strong></div>
+    <aside id="sidebar" class="sidebar" aria-label="Menu principale">
+      <div class="sidebar-head">
+        <div class="brand desktop-brand"><img src="logo-square.png" alt=""><strong>Passo<br>dopo Passo</strong></div>
+        <div class="sidebar-profile">
+          <img src="child-avatar.png" alt="" class="sidebar-avatar">
+          <div><strong id="sidebarChildName">Bambino</strong><small id="sidebarJourneyLabel">Il vostro percorso</small></div>
+        </div>
+        <label class="nav-search"><span>⌕</span><input id="navSearch" type="search" placeholder="Cerca una sezione" aria-label="Cerca una sezione"></label>
+      </div>
       <nav id="mainNav" class="main-nav">
-        <button class="nav-item active" data-view="dashboard"><span>🏠</span>Dashboard</button>
-        <button class="nav-item" data-view="percorso"><span>🧭</span>Il percorso</button>
-        <button class="nav-item" data-view="checklist"><span>✅</span>Checklist</button>
-        <button class="nav-item" data-view="calendario"><span>📅</span>Calendario</button>
-        <button class="nav-item" data-view="visite"><span>🩺</span>Visite</button>
-        <button class="nav-item" data-view="preparazione"><span>🧳</span>Prepariamoci</button>
-        <button class="nav-item" data-view="diagnosi"><span>🤝</span>Primi passi</button>
-        <button class="nav-item" data-view="biblioteca"><span>📚</span>Impariamo insieme</button>
-        <button class="nav-item" data-view="assistente"><span>🤖</span>Assistente</button>
-        <button class="nav-item" data-view="salute"><span>❤️</span>Salute e terapie</button>
-        <button class="nav-item" data-view="documenti"><span>📁</span>Documenti</button>
-        <button class="nav-item" data-view="scuola"><span>🎓</span>Scuola</button>
-        <button class="nav-item" data-view="agevolazioni"><span>🎁</span>Agevolazioni</button>
-        <button class="nav-item" data-view="spese"><span>👛</span>Spese</button>
-        <button class="nav-item" data-view="diario"><span>📘</span>Diario</button>
-        <button class="nav-item" data-view="impostazioni"><span>⚙️</span>Impostazioni</button>
+        <div class="nav-group" data-nav-group="home"><span class="nav-group-title">OGGI</span>
+          <button class="nav-item active" data-view="dashboard" data-label="dashboard home oggi"><span>⌂</span><b>Dashboard</b></button>
+          <button class="nav-item" data-view="calendario" data-label="calendario appuntamenti"><span>▣</span><b>Calendario</b><em id="badgeCalendario" class="nav-badge hidden">0</em></button>
+        </div>
+        <div class="nav-group" data-nav-group="journey"><button class="nav-group-toggle" type="button" aria-expanded="true"><span>PERCORSO</span><i>⌃</i></button><div class="nav-group-items">
+          <button class="nav-item" data-view="percorso" data-label="percorso viaggio tappe"><span>◉</span><b>Il percorso</b></button>
+          <button class="nav-item" data-view="checklist" data-label="checklist attività"><span>✓</span><b>Checklist</b><em id="badgeChecklist" class="nav-badge hidden">0</em></button>
+          <button class="nav-item pregnancy-only" data-view="preparazione" data-label="prepariamoci nascita valigia"><span>▤</span><b>Prepariamoci</b></button>
+          <button class="nav-item pregnancy-only" data-view="diagnosi" data-label="primi passi diagnosi"><span>◇</span><b>Primi passi</b></button>
+          <button class="nav-item" data-view="diario" data-label="diario ricordi traguardi"><span>✦</span><b>Diario</b></button>
+        </div></div>
+        <div class="nav-group" data-nav-group="care"><button class="nav-group-toggle" type="button" aria-expanded="true"><span>CURA E DOCUMENTI</span><i>⌃</i></button><div class="nav-group-items">
+          <button class="nav-item" data-view="visite" data-label="visite medici controlli"><span>＋</span><b>Visite</b><em id="badgeVisite" class="nav-badge hidden">0</em></button>
+          <button class="nav-item" data-view="salute" data-label="salute terapie"><span>♡</span><b>Salute e terapie</b></button>
+          <button class="nav-item" data-view="documenti" data-label="documenti referti"><span>▱</span><b>Documenti</b><em id="badgeDocumenti" class="nav-badge hidden">0</em></button>
+        </div></div>
+        <div class="nav-group" data-nav-group="support"><button class="nav-group-toggle" type="button" aria-expanded="true"><span>SUPPORTO</span><i>⌃</i></button><div class="nav-group-items">
+          <button class="nav-item" data-view="assistente" data-label="assistente ai ricerca"><span>✧</span><b>Assistente</b></button>
+          <button class="nav-item" data-view="biblioteca" data-label="impariamo insieme biblioteca guide"><span>▥</span><b>Impariamo insieme</b></button>
+          <button class="nav-item born-only" data-view="scuola" data-label="scuola pei"><span>⌂</span><b>Scuola</b></button>
+          <button class="nav-item born-only" data-view="agevolazioni" data-label="agevolazioni bonus 104"><span>◎</span><b>Agevolazioni</b></button>
+          <button class="nav-item born-only" data-view="spese" data-label="spese costi"><span>€</span><b>Spese</b></button>
+        </div></div>
       </nav>
       <div class="sidebar-footer">
-        <span id="syncStatus">Solo dispositivo</span>
-        <button id="syncBtn" class="soft-btn">Sincronizza</button>
+        <button class="footer-link" data-view="impostazioni"><span>⚙</span><b>Impostazioni</b></button>
+        <div class="sync-row"><span><i id="syncDotFooter" class="sync-dot"></i><span id="syncStatus">Solo dispositivo</span></span><button id="syncBtn" class="mini-btn">Sincronizza</button></div>
+        <small>Versione <span id="sidebarVersion">3.3.0</span></small>
       </div>
     </aside>
 
@@ -232,10 +247,26 @@
         </section>
       </section>
 
-      <section id="impostazioni" class="view"><div class="page-head"><div><h1>Impostazioni</h1><p>Profilo, sincronizzazione e dati.</p></div></div><div class="panel settings-panel"><button id="reloadBtn" class="soft-btn">Scarica dal Foglio Google</button><button id="installBtn" class="soft-btn hidden">Installa app</button><button id="editProfileBtn" class="soft-btn">Modifica profilo</button><button id="resetBtn" class="danger-btn">Cancella dati locali</button><div class="version-info"><span>Versione installata</span><strong id="appVersion">3.1.1</strong><button id="checkUpdateBtn" class="soft-btn">Controlla aggiornamenti</button></div><p id="apiInfo" class="privacy-note"></p></div></section>
+      <section id="impostazioni" class="view">
+        <div class="page-head"><div><h1>Impostazioni</h1><p>Profilo, famiglia, accessibilità e sincronizzazione.</p></div></div>
+        <div class="settings-grid">
+          <section class="panel settings-panel"><h2>Profilo e dati</h2><button id="reloadBtn" class="soft-btn">Scarica dal Foglio Google</button><button id="installBtn" class="soft-btn hidden">Installa app</button><button id="editProfileBtn" class="soft-btn">Modifica profilo bambino</button><button id="resetBtn" class="danger-btn">Cancella dati locali</button><p id="apiInfo" class="privacy-note"></p></section>
+          <section class="panel"><h2>Aspetto e accessibilità</h2><div class="settings-form">
+            <label>Tema<select id="themeSelect"><option value="system">Automatico</option><option value="light">Chiaro</option><option value="dark">Scuro</option></select></label>
+            <label>Dimensione testo<select id="textSizeSelect"><option value="normal">Normale</option><option value="large">Grande</option><option value="xlarge">Molto grande</option></select></label>
+            <label class="switch-row"><input id="highContrastToggle" type="checkbox"><span>Contrasto elevato</span></label>
+            <label class="switch-row"><input id="largeIconsToggle" type="checkbox"><span>Icone grandi</span></label>
+          </div></section>
+          <section class="panel family-panel"><div class="panel-title"><div><h2>Persone della famiglia</h2><p class="privacy-note">Gestisci chi usa questo profilo e il suo livello di accesso.</p></div><button id="addMemberBtn" class="primary-btn">Aggiungi</button></div><div id="familyMembersList" class="members-list"></div></section>
+          <section class="panel"><h2>Aggiornamenti</h2><div class="version-info"><span>Versione installata</span><strong id="appVersion">3.3.0</strong><button id="checkUpdateBtn" class="soft-btn">Controlla aggiornamenti</button></div></section>
+        </div>
+      </section>
     </main>
 
-    <nav class="bottom-nav"><button class="active" data-view="dashboard">🏠<small>Home</small></button><button data-view="percorso">🧭<small>Percorso</small></button><button id="bottomSync">🔄<small>Sincronizza</small></button><button data-view="impostazioni">👤<small>Profilo</small></button></nav>
+    <nav class="bottom-nav" aria-label="Navigazione rapida"><button class="active" data-view="dashboard"><span>⌂</span><small>Home</small></button><button data-view="calendario"><span>▣</span><small>Calendario</small></button><button id="quickAddBtn" class="quick-add-main" type="button" aria-label="Aggiungi"><span>＋</span><small>Aggiungi</small></button><button data-view="assistente"><span>✧</span><small>Assistente</small></button><button data-view="impostazioni"><span>○</span><small>Profilo</small></button></nav>
+    <div id="menuBackdrop" class="menu-backdrop hidden"></div>
+    <div id="quickAddSheet" class="bottom-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="quickAddTitle"><div class="sheet-handle"></div><div class="sheet-head"><h2 id="quickAddTitle">Aggiungi</h2><button id="quickAddClose" class="icon-button" aria-label="Chiudi">×</button></div><div class="quick-add-grid"><button data-quick-view="documenti"><span>▱</span><b>Documento</b></button><button data-quick-view="visite"><span>＋</span><b>Visita</b></button><button data-quick-view="diario"><span>✦</span><b>Diario</b></button><button data-quick-view="calendario"><span>▣</span><b>Appuntamento</b></button><button data-quick-view="salute"><span>♡</span><b>Salute</b></button><button data-quick-view="assistente"><span>✧</span><b>Assistente</b></button></div></div>
+    <div id="memberDialog" class="modal-layer hidden" role="dialog" aria-modal="true" aria-labelledby="memberDialogTitle"><form id="memberForm" class="modal-card"><div class="sheet-head"><h2 id="memberDialogTitle">Persona della famiglia</h2><button id="memberDialogClose" type="button" class="icon-button">×</button></div><input id="memberId" type="hidden"><label>Nome<input id="memberName" required placeholder="Es. Maria"></label><label>Ruolo<select id="memberRole"><option value="Mamma">Mamma</option><option value="Papà">Papà</option><option value="Nonna">Nonna</option><option value="Nonno">Nonno</option><option value="Caregiver">Caregiver</option><option value="Altro">Altro</option></select></label><label>Permessi<select id="memberPermission"><option value="owner">Amministratore</option><option value="editor">Può modificare</option><option value="viewer">Solo lettura</option></select></label><button class="primary-btn" type="submit">Salva persona</button><p class="privacy-note">Questi non sono ancora account con password: sono profili familiari collegati allo stesso codice famiglia.</p></form></div>
     <div id="updateBanner" class="update-banner hidden" role="status" aria-live="polite">
       <div><strong>Nuova versione disponibile</strong><small>L’aggiornamento è pronto e non cancellerà i tuoi dati.</small></div>
       <div class="update-actions"><button id="updateLaterBtn" class="soft-btn">Più tardi</button><button id="applyUpdateBtn" class="primary-btn">Aggiorna adesso</button></div>
