@@ -1,4 +1,4 @@
-const CACHE = 'passo-dopo-passo-v400';
+const CACHE = 'passo-dopo-passo-v410';
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './config.js', './firebase-config.js', './firebase-auth.js',
   './manifest.json', './logo-square.png', './child-avatar.png',

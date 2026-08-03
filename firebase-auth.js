@@ -6,7 +6,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js';
 import {
   getFirestore, doc, getDoc, setDoc, updateDoc, collection,
-  getDocs, serverTimestamp, writeBatch, onSnapshot
+  getDocs, serverTimestamp, writeBatch, onSnapshot, deleteDoc, query, where, runTransaction, increment
 } from 'https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js';
 
 const cfg = window.FIREBASE_CONFIG || {};
@@ -14,7 +14,7 @@ const configured = cfg.apiKey && !String(cfg.apiKey).includes('INCOLLA_');
 const authScreen = document.getElementById('authScreen');
 const authStatus = document.getElementById('authStatus');
 const familySetup = document.getElementById('familySetup');
-let app, auth, db, currentFamilyId = '', currentMember = null, unsubscribeFamily = null;
+let app, auth, db, currentFamilyId = '', currentMember = null, unsubscribeFamily = null, currentRevision = 0, lastCloudPayload = null;
 
 function text(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
 function show(el, yes = true) { if (el) el.classList.toggle('hidden', !yes); }
@@ -60,7 +60,10 @@ async function activateFamily(familyId, member) {
   if (unsubscribeFamily) unsubscribeFamily();
   unsubscribeFamily = onSnapshot(doc(db, 'families', familyId), async snap => {
     if (!snap.exists()) return;
-    const payload = snap.data().data || null;
+    const familyDoc = snap.data();
+    currentRevision = Number(familyDoc.revision || 0);
+    const payload = familyDoc.data || null;
+    lastCloudPayload = payload ? JSON.parse(JSON.stringify(payload)) : null;
     const members = await loadMembers(familyId);
     if (payload && window.PDP_APP) {
       payload.profile = payload.profile || {};
@@ -69,7 +72,7 @@ async function activateFamily(familyId, member) {
         id: m.id, name: m.name || m.email || 'Familiare', role: roleLabel(m.role), permission: m.permission || 'viewer', email: m.email || ''
       }));
       payload.activeMemberId = auth.currentUser.uid;
-      window.PDP_APP.replaceState(payload, { fromCloud: true });
+      window.PDP_APP.replaceState(payload, { fromCloud: true, revision: currentRevision, updatedAt: familyDoc.updatedAt?.toDate?.()?.toISOString?.() || '' });
     }
     updateAccountPanel();
   }, err => setStatus('Sincronizzazione Firebase non disponibile: ' + err.message, true));
@@ -82,7 +85,7 @@ async function updateAccountPanel() {
   text('accountEmail', user.email || '');
   text('accountRole', `${currentMember?.name || user.displayName || 'Utente'} · ${roleLabel(currentMember?.role)} · ${currentMember?.permission || ''}`);
   const inviteBtn = document.getElementById('createInviteBtn');
-  if (inviteBtn) inviteBtn.classList.toggle('hidden', currentMember?.permission !== 'owner');
+  if (inviteBtn) inviteBtn.classList.toggle('hidden', !['owner','admin'].includes(currentMember?.permission));
 }
 
 async function createFamily(name, role) {
@@ -101,7 +104,7 @@ async function createFamily(name, role) {
   cloudData.members = [];
   cloudData.activeMemberId = user.uid;
   const batch = writeBatch(db);
-  batch.set(familyRef, { name: name || 'La nostra famiglia', ownerUid: user.uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), data: cloudData });
+  batch.set(familyRef, { name: name || 'La nostra famiglia', ownerUid: user.uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), updatedBy: user.uid, revision: 1, data: cloudData });
   batch.set(doc(db, 'families', familyId, 'members', user.uid), member);
   batch.set(doc(db, 'users', user.uid), { email: user.email || '', displayName: user.displayName || '', activeFamilyId: familyId, updatedAt: serverTimestamp() }, { merge: true });
   await batch.commit();
@@ -121,15 +124,17 @@ async function joinFamily(inviteCode, name) {
     email: user.email || '', role: invite.role || 'Mamma', permission: invite.permission || 'editor',
     inviteCode: code, joinedAt: serverTimestamp()
   };
+  if (invite.revokedAt || invite.usedBy) throw new Error('Questo invito non è più valido.');
   const batch = writeBatch(db);
   batch.set(doc(db, 'families', invite.familyId, 'members', user.uid), member);
   batch.set(doc(db, 'users', user.uid), { email: user.email || '', displayName: user.displayName || '', activeFamilyId: invite.familyId, updatedAt: serverTimestamp() }, { merge: true });
+  batch.update(inviteRef, { usedBy: user.uid, usedAt: serverTimestamp() });
   await batch.commit();
   await activateFamily(invite.familyId, member);
 }
 
 async function createInvite(role, permission) {
-  if (!currentFamilyId || currentMember?.permission !== 'owner') throw new Error('Solo un amministratore può creare inviti.');
+  if (!currentFamilyId || !['owner','admin'].includes(currentMember?.permission)) throw new Error('Solo un amministratore può creare inviti.');
   const code = randomCode();
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   await setDoc(doc(db, 'invites', code), {
@@ -139,7 +144,7 @@ async function createInvite(role, permission) {
   return code;
 }
 
-async function saveFamilyData(data) {
+async function saveFamilyData(data, options = {}) {
   if (!currentFamilyId || !auth.currentUser) return false;
   if (currentMember?.permission === 'viewer') throw new Error('Questo profilo è in sola lettura.');
   const clean = cleanStateForCloud(data);
@@ -147,10 +152,50 @@ async function saveFamilyData(data) {
   clean.profile.familyCode = currentFamilyId;
   clean.members = [];
   clean.activeMemberId = auth.currentUser.uid;
-  await updateDoc(doc(db, 'families', currentFamilyId), { data: clean, updatedAt: serverTimestamp() });
-  return true;
+  const familyRef = doc(db, 'families', currentFamilyId);
+  const result = await runTransaction(db, async tx => {
+    const snap = await tx.get(familyRef);
+    if (!snap.exists()) throw new Error('Famiglia non trovata.');
+    const remote = snap.data();
+    const remoteRevision = Number(remote.revision || 0);
+    const baseRevision = Number(options.baseRevision ?? currentRevision ?? 0);
+    if (!options.force && remoteRevision > baseRevision && remote.updatedBy && remote.updatedBy !== auth.currentUser.uid) {
+      const err = new Error('Sono presenti modifiche più recenti da un altro dispositivo.');
+      err.code = 'pdp/conflict'; err.remoteData = remote.data || {}; err.remoteRevision = remoteRevision;
+      throw err;
+    }
+    const nextRevision = remoteRevision + 1;
+    tx.update(familyRef, { data: clean, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.uid, revision: nextRevision });
+    return nextRevision;
+  });
+  currentRevision = result;
+  lastCloudPayload = clean;
+  return { ok: true, revision: result };
 }
 
+
+async function listInvites() {
+  if (!currentFamilyId || !['owner','admin'].includes(currentMember?.permission)) return [];
+  const snap = await getDocs(query(collection(db, 'invites'), where('familyId', '==', currentFamilyId)));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
+}
+async function revokeInvite(code) {
+  if (!['owner','admin'].includes(currentMember?.permission)) throw new Error('Solo un amministratore può revocare inviti.');
+  await updateDoc(doc(db, 'invites', code), { revokedAt: serverTimestamp(), revokedBy: auth.currentUser.uid });
+  return true;
+}
+async function updateMember(memberId, changes) {
+  if (!['owner','admin'].includes(currentMember?.permission)) throw new Error('Solo un amministratore può modificare i membri.');
+  if (memberId === auth.currentUser.uid && changes.permission === 'viewer') throw new Error('Non puoi toglierti i permessi di amministratore.');
+  await updateDoc(doc(db, 'families', currentFamilyId, 'members', memberId), { ...changes, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.uid });
+  return true;
+}
+async function removeMember(memberId) {
+  if (!['owner','admin'].includes(currentMember?.permission)) throw new Error('Solo un amministratore può revocare accessi.');
+  if (memberId === auth.currentUser.uid) throw new Error('Non puoi rimuovere il tuo account dalla famiglia.');
+  await deleteDoc(doc(db, 'families', currentFamilyId, 'members', memberId));
+  return true;
+}
 window.PDP_CLOUD = {
   isConfigured: () => configured,
   isReady: () => !!(auth?.currentUser && currentFamilyId),
@@ -158,10 +203,14 @@ window.PDP_CLOUD = {
   getFamilyId: () => currentFamilyId,
   getMember: () => currentMember,
   save: saveFamilyData,
+  getRevision: () => currentRevision,
+  getLastCloudData: () => lastCloudPayload,
+  listMembers: () => loadMembers(currentFamilyId),
+  updateMember, removeMember, listInvites, revokeInvite,
   reload: async () => {
     if (!currentFamilyId) return false;
     const snap = await getDoc(doc(db, 'families', currentFamilyId));
-    if (snap.exists() && window.PDP_APP) window.PDP_APP.replaceState(snap.data().data || {}, { fromCloud: true });
+    if (snap.exists() && window.PDP_APP) { const d=snap.data(); currentRevision=Number(d.revision||0); lastCloudPayload=d.data||{}; window.PDP_APP.replaceState(d.data || {}, { fromCloud: true, revision: currentRevision, updatedAt: d.updatedAt?.toDate?.()?.toISOString?.() || '' }); }
     return true;
   },
   logout: () => signOut(auth),

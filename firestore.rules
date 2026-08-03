@@ -1,59 +1,36 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function memberPath(familyId) {
-      return /databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid);
-    }
-    function isMember(familyId) {
-      return signedIn() && exists(memberPath(familyId));
-    }
-    function memberPermission(familyId) {
-      return get(memberPath(familyId)).data.permission;
-    }
-    function canEdit(familyId) {
-      return isMember(familyId) && memberPermission(familyId) in ['owner', 'editor'];
-    }
-    function isOwner(familyId) {
-      return isMember(familyId) && memberPermission(familyId) == 'owner';
-    }
+    function signedIn(){ return request.auth != null; }
+    function memberPath(fid){ return /databases/$(database)/documents/families/$(fid)/members/$(request.auth.uid); }
+    function member(fid){ return signedIn() && exists(memberPath(fid)); }
+    function permission(fid){ return get(memberPath(fid)).data.permission; }
+    function admin(fid){ return member(fid) && permission(fid) in ['owner','admin']; }
+    function editor(fid){ return member(fid) && permission(fid) in ['owner','admin','editor']; }
+    function willBeMember(fid){ return signedIn() && existsAfter(memberPath(fid)); }
 
     match /users/{uid} {
-      allow read, create, update: if signedIn() && request.auth.uid == uid;
+      allow create, read, update: if signedIn() && request.auth.uid == uid;
       allow delete: if false;
     }
-
-    match /families/{familyId} {
+    match /families/{fid} {
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow read: if isMember(familyId);
-      allow update: if canEdit(familyId);
-      allow delete: if isOwner(familyId);
-
+      allow read: if member(fid);
+      allow update: if editor(fid) || (willBeMember(fid) && request.auth.uid == resource.data.ownerUid);
+      allow delete: if false;
       match /members/{uid} {
-        allow read: if isMember(familyId);
-        allow create: if signedIn() && (
-          (request.auth.uid == uid &&
-           request.resource.data.permission == 'owner' &&
-           getAfter(/databases/$(database)/documents/families/$(familyId)).data.ownerUid == request.auth.uid)
-          ||
-          (request.auth.uid == uid &&
-           request.resource.data.inviteCode is string &&
-           exists(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)) &&
-           get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.familyId == familyId &&
-           get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.expiresAt > request.time)
-        );
-        allow update: if isOwner(familyId) || request.auth.uid == uid;
-        allow delete: if isOwner(familyId) && uid != request.auth.uid;
+        allow read: if member(fid);
+        allow create: if signedIn() && (request.auth.uid == uid || admin(fid));
+        allow update, delete: if admin(fid);
       }
+      match /data/{docId} { allow read: if member(fid); allow write: if editor(fid); }
     }
-
     match /invites/{code} {
       allow get: if signedIn();
-      allow list: if false;
-      allow create: if signedIn() &&
-        request.resource.data.createdBy == request.auth.uid &&
-        isOwner(request.resource.data.familyId);
-      allow update, delete: if signedIn() && isOwner(resource.data.familyId);
+      allow list: if signedIn();
+      allow create: if signedIn() && admin(request.resource.data.familyId) && request.resource.data.createdBy == request.auth.uid;
+      allow update: if signedIn() && (admin(resource.data.familyId) || (!resource.data.keys().hasAny(['usedBy']) && request.resource.data.usedBy == request.auth.uid));
+      allow delete: if signedIn() && admin(resource.data.familyId);
     }
   }
 }
