@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function memberPath(familyId) {
+      return /databases/$(database)/documents/families/$(familyId)/members/$(request.auth.uid);
+    }
+    function isMember(familyId) {
+      return signedIn() && exists(memberPath(familyId));
+    }
+    function memberPermission(familyId) {
+      return get(memberPath(familyId)).data.permission;
+    }
+    function canEdit(familyId) {
+      return isMember(familyId) && memberPermission(familyId) in ['owner', 'editor'];
+    }
+    function isOwner(familyId) {
+      return isMember(familyId) && memberPermission(familyId) == 'owner';
+    }
+
+    match /users/{uid} {
+      allow read, create, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    match /families/{familyId} {
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow read: if isMember(familyId);
+      allow update: if canEdit(familyId);
+      allow delete: if isOwner(familyId);
+
+      match /members/{uid} {
+        allow read: if isMember(familyId);
+        allow create: if signedIn() && (
+          (request.auth.uid == uid &&
+           request.resource.data.permission == 'owner' &&
+           getAfter(/databases/$(database)/documents/families/$(familyId)).data.ownerUid == request.auth.uid)
+          ||
+          (request.auth.uid == uid &&
+           request.resource.data.inviteCode is string &&
+           exists(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)) &&
+           get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.familyId == familyId &&
+           get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.expiresAt > request.time)
+        );
+        allow update: if isOwner(familyId) || request.auth.uid == uid;
+        allow delete: if isOwner(familyId) && uid != request.auth.uid;
+      }
+    }
+
+    match /invites/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() &&
+        request.resource.data.createdBy == request.auth.uid &&
+        isOwner(request.resource.data.familyId);
+      allow update, delete: if signedIn() && isOwner(resource.data.familyId);
+    }
+  }
+}

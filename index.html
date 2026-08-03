@@ -12,6 +12,50 @@
   <title>Passo dopo Passo</title>
 </head>
 <body>
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <img src="logo-square.png" alt="Logo Passo dopo Passo" class="auth-logo">
+      <h1>Passo dopo Passo</h1>
+      <p>Accedi con il tuo account personale.</p>
+      <div class="auth-tabs">
+        <button type="button" class="active" data-auth-tab="login">Accedi</button>
+        <button type="button" data-auth-tab="register">Registrati</button>
+      </div>
+      <form id="loginForm" class="form-stack">
+        <label>Email<input id="loginEmail" type="email" autocomplete="email" required></label>
+        <label>Password<input id="loginPassword" type="password" autocomplete="current-password" minlength="6" required></label>
+        <button class="primary-btn" type="submit">Accedi</button>
+        <button id="forgotPasswordBtn" class="text-btn" type="button">Password dimenticata?</button>
+      </form>
+      <form id="registerForm" class="form-stack hidden">
+        <label>Nome<input id="registerName" autocomplete="name" required placeholder="Es. Maria"></label>
+        <label>Email<input id="registerEmail" type="email" autocomplete="email" required></label>
+        <label>Password<input id="registerPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+        <button class="primary-btn" type="submit">Crea account</button>
+      </form>
+      <section id="familySetup" class="family-setup hidden">
+        <hr>
+        <h2>Collega il tuo account</h2>
+        <div class="auth-tabs compact">
+          <button type="button" class="active" data-family-mode="create">Crea famiglia</button>
+          <button type="button" data-family-mode="join">Usa invito</button>
+        </div>
+        <form id="createFamilyForm" class="form-stack">
+          <label>Nome della famiglia<input id="newFamilyName" required placeholder="Es. Famiglia Rossi"></label>
+          <label>Il tuo ruolo<select id="ownerRole"><option value="Papà">Papà</option><option value="Mamma">Mamma</option><option value="Caregiver">Caregiver</option></select></label>
+          <button class="primary-btn" type="submit">Crea la famiglia</button>
+          <small>I dati già presenti su questo dispositivo verranno importati.</small>
+        </form>
+        <form id="joinFamilyForm" class="form-stack hidden">
+          <label>Il tuo nome<input id="joinMemberName" required placeholder="Es. Maria"></label>
+          <label>Codice invito<input id="inviteCode" required maxlength="10" placeholder="Es. 7KPD4M9Q2X"></label>
+          <button class="primary-btn" type="submit">Entra nella famiglia</button>
+        </form>
+      </section>
+      <p id="authStatus" class="auth-status" aria-live="polite"></p>
+    </div>
+  </section>
+
   <section id="onboarding" class="onboarding hidden">
     <div class="onboarding-card">
       <img src="logo-square.png" alt="Logo Passo dopo Passo" class="onboarding-logo">
@@ -20,11 +64,11 @@
       <form id="profileForm" class="form-stack">
         <label>Nome del bambino <small>(anche provvisorio)</small><input id="childName" required placeholder="Es. Lorenzo"></label>
         <label>Il bambino è già nato?<select id="journeyMode"><option value="pregnancy">No, siamo in attesa</option><option value="born">Sì, è già nato</option></select></label>
-        <label>Codice famiglia<input id="familyCode" required minlength="6" placeholder="Es. FAM7K29X"></label>
+        <input id="familyCode" type="hidden">
         <label id="birthDateLabel">Data presunta del parto<input id="birthDate" type="date" required></label>
         <button type="submit" class="primary-btn">Entra nell'app</button>
       </form>
-      <small>Usa lo stesso codice famiglia su tutti i dispositivi.</small>
+      <small>Il profilo viene salvato nella famiglia collegata al tuo account.</small>
     </div>
   </section>
 
@@ -71,7 +115,7 @@
       <div class="sidebar-footer">
         <button class="footer-link" data-view="impostazioni"><span>⚙</span><b>Impostazioni</b></button>
         <div class="sync-row"><span><i id="syncDotFooter" class="sync-dot"></i><span id="syncStatus">Solo dispositivo</span></span><button id="syncBtn" class="mini-btn">Sincronizza</button></div>
-        <small>Versione <span id="sidebarVersion">3.3.0</span></small>
+        <small>Versione <span id="sidebarVersion">4.0.0</span></small>
       </div>
     </aside>
 
@@ -257,8 +301,9 @@
             <label class="switch-row"><input id="highContrastToggle" type="checkbox"><span>Contrasto elevato</span></label>
             <label class="switch-row"><input id="largeIconsToggle" type="checkbox"><span>Icone grandi</span></label>
           </div></section>
-          <section class="panel family-panel"><div class="panel-title"><div><h2>Persone della famiglia</h2><p class="privacy-note">Gestisci chi usa questo profilo e il suo livello di accesso.</p></div><button id="addMemberBtn" class="primary-btn">Aggiungi</button></div><div id="familyMembersList" class="members-list"></div></section>
-          <section class="panel"><h2>Aggiornamenti</h2><div class="version-info"><span>Versione installata</span><strong id="appVersion">3.3.0</strong><button id="checkUpdateBtn" class="soft-btn">Controlla aggiornamenti</button></div></section>
+          <section class="panel family-panel"><div class="panel-title"><div><h2>Account della famiglia</h2><p class="privacy-note">Ogni persona accede con la propria email e password.</p></div></div><div class="account-summary"><strong id="accountEmail">—</strong><small id="accountRole">—</small><button id="logoutBtn" class="soft-btn" type="button">Esci dall’account</button></div><div id="familyMembersList" class="members-list"></div></section>
+          <section class="panel invite-panel"><h2>Invita una persona</h2><p class="privacy-note">Il codice è valido per 7 giorni e può essere usato dopo la registrazione.</p><div class="settings-form"><label>Ruolo<select id="inviteRole"><option value="Mamma">Mamma</option><option value="Papà">Papà</option><option value="Nonna">Nonna</option><option value="Nonno">Nonno</option><option value="Caregiver">Caregiver</option><option value="Altro">Altro</option></select></label><label>Permessi<select id="invitePermission"><option value="editor">Può modificare</option><option value="viewer">Solo lettura</option></select></label><button id="createInviteBtn" class="primary-btn" type="button">Genera codice invito</button><div id="inviteResult" class="invite-result hidden"><label>Codice invito<input id="generatedInviteCode" readonly></label><button id="copyInviteBtn" class="soft-btn" type="button">Copia codice</button></div></div></section>
+          <section class="panel"><h2>Aggiornamenti</h2><div class="version-info"><span>Versione installata</span><strong id="appVersion">4.0.0</strong><button id="checkUpdateBtn" class="soft-btn">Controlla aggiornamenti</button></div></section>
         </div>
       </section>
     </main>
@@ -266,13 +311,12 @@
     <nav class="bottom-nav" aria-label="Navigazione rapida"><button class="active" data-view="dashboard"><span>⌂</span><small>Home</small></button><button data-view="calendario"><span>▣</span><small>Calendario</small></button><button id="quickAddBtn" class="quick-add-main" type="button" aria-label="Aggiungi"><span>＋</span><small>Aggiungi</small></button><button data-view="assistente"><span>✧</span><small>Assistente</small></button><button data-view="impostazioni"><span>○</span><small>Profilo</small></button></nav>
     <div id="menuBackdrop" class="menu-backdrop hidden"></div>
     <div id="quickAddSheet" class="bottom-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="quickAddTitle"><div class="sheet-handle"></div><div class="sheet-head"><h2 id="quickAddTitle">Aggiungi</h2><button id="quickAddClose" class="icon-button" aria-label="Chiudi">×</button></div><div class="quick-add-grid"><button data-quick-view="documenti"><span>▱</span><b>Documento</b></button><button data-quick-view="visite"><span>＋</span><b>Visita</b></button><button data-quick-view="diario"><span>✦</span><b>Diario</b></button><button data-quick-view="calendario"><span>▣</span><b>Appuntamento</b></button><button data-quick-view="salute"><span>♡</span><b>Salute</b></button><button data-quick-view="assistente"><span>✧</span><b>Assistente</b></button></div></div>
-    <div id="memberDialog" class="modal-layer hidden" role="dialog" aria-modal="true" aria-labelledby="memberDialogTitle"><form id="memberForm" class="modal-card"><div class="sheet-head"><h2 id="memberDialogTitle">Persona della famiglia</h2><button id="memberDialogClose" type="button" class="icon-button">×</button></div><input id="memberId" type="hidden"><label>Nome<input id="memberName" required placeholder="Es. Maria"></label><label>Ruolo<select id="memberRole"><option value="Mamma">Mamma</option><option value="Papà">Papà</option><option value="Nonna">Nonna</option><option value="Nonno">Nonno</option><option value="Caregiver">Caregiver</option><option value="Altro">Altro</option></select></label><label>Permessi<select id="memberPermission"><option value="owner">Amministratore</option><option value="editor">Può modificare</option><option value="viewer">Solo lettura</option></select></label><button class="primary-btn" type="submit">Salva persona</button><p class="privacy-note">Questi non sono ancora account con password: sono profili familiari collegati allo stesso codice famiglia.</p></form></div>
     <div id="updateBanner" class="update-banner hidden" role="status" aria-live="polite">
       <div><strong>Nuova versione disponibile</strong><small>L’aggiornamento è pronto e non cancellerà i tuoi dati.</small></div>
       <div class="update-actions"><button id="updateLaterBtn" class="soft-btn">Più tardi</button><button id="applyUpdateBtn" class="primary-btn">Aggiorna adesso</button></div>
     </div>
   </div>
 
-  <script src="config.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script><script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script><script src="app.js"></script>
+  <script src="config.js"></script><script src="firebase-config.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script><script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script><script src="app.js"></script><script type="module" src="firebase-auth.js"></script>
 </body>
 </html>
