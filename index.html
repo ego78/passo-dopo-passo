@@ -285,8 +285,9 @@
             <label>Come sta la mamma?<select id="pregDiaryMother"><option>Serena</option><option>Felice</option><option>Stanca</option><option>Preoccupata</option><option>Emozionata</option><option>Altro</option></select></label>
             <label>Come sta il papà?<select id="pregDiaryFather"><option>Sereno</option><option>Felice</option><option>Preoccupato</option><option>Emozionato</option><option>Stanco</option><option>Altro</option></select></label>
             <label class="full">Un momento da ricordare<textarea id="pregDiaryMemory" required placeholder="Un movimento sentito, una visita, una frase, un'emozione..."></textarea></label>
+            <div class="full diary-photo-box"><strong>📷 Foto di questa settimana</strong><p class="privacy-note">Puoi scattare o scegliere più foto. Verranno collegate a questa settimana, archiviate nel Centro documenti e caricate su Google Drive quando disponibile.</p><div class="diary-photo-actions"><label class="soft-btn file-action">📷 Scatta / scegli foto<input id="pregDiaryPhotos" type="file" accept="image/*" multiple hidden></label></div><div id="pregDiaryPhotoPreview" class="diary-photo-preview"></div></div>
             <label class="full">Domande per il medico<textarea id="pregDiaryQuestions" placeholder="Scrivi qui le domande da non dimenticare"></textarea></label>
-            <button class="primary-btn full">Salva questa settimana</button>
+            <button id="pregDiarySubmit" class="primary-btn full">Salva questa settimana</button>
           </form>
           <div id="pregnancyDiaryList" class="weekly-diary-list"></div>
         </section>
