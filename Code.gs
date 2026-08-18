@@ -129,6 +129,22 @@ function getFamilyFolder_(familyCode) {
   return folders.hasNext() ? folders.next() : root.createFolder(familyCode);
 }
 
+
+function shareFileWithMembers_(file, emails) {
+  const shared = [];
+  const failed = [];
+  const unique = [...new Set((emails || []).map(function(v) { return String(v || '').trim().toLowerCase(); }).filter(Boolean))];
+  unique.forEach(function(email) {
+    try {
+      file.addViewer(email);
+      shared.push(email);
+    } catch (error) {
+      failed.push({ email: email, error: error.message });
+    }
+  });
+  return { shared: shared, failed: failed };
+}
+
 function uploadFile_(payload) {
   const code = normalizeCode_(payload.familyCode);
   const documentId = String(payload.documentId || '').trim();
@@ -148,6 +164,7 @@ function uploadFile_(payload) {
   const blob = Utilities.newBlob(bytes, mimeType, fileName);
   const file = folder.createFile(blob);
   file.setDescription('Passo dopo Passo | ' + documentName + ' | famiglia ' + code);
+  const sharing = shareFileWithMembers_(file, payload.memberEmails || []);
   const uploadedAt = new Date();
 
   const sheet = getDocumentsSheet_();
@@ -163,7 +180,9 @@ function uploadFile_(payload) {
     fileUrl: file.getUrl(),
     fileName: file.getName(),
     fileSize: bytes.length,
-    uploadedAt: uploadedAt.toISOString()
+    uploadedAt: uploadedAt.toISOString(),
+    sharedWith: sharing.shared,
+    sharingErrors: sharing.failed
   };
 }
 
