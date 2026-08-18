@@ -1,3 +1,7 @@
+# Passo dopo Passo 4.1.11 — Sync Fix
+
+Correzione critica: Firestore è la fonte principale dopo il login; le code locali obsolete non possono più sovrascrivere una revisione cloud più recente. Aggiunta diagnostica sincronizzazione in Impostazioni. Google Drive/Apps Script restano dedicati ai file.
+
 # Passo dopo Passo 4.1.10 — Diario fotografico
 
 Aggiornamento cumulativo basato sulla 4.1.9.

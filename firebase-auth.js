@@ -44,7 +44,7 @@ function randomCode() {
 function roleLabel(role) { return role || 'Familiare'; }
 function isAdmin() { return ['owner', 'admin'].includes(currentMember?.permission); }
 function pendingRead() { try { return JSON.parse(localStorage.getItem(PENDING_KEY) || 'null'); } catch { return null; } }
-function pendingWrite(data) { localStorage.setItem(PENDING_KEY, JSON.stringify({ familyId: currentFamilyId, data, savedAt: new Date().toISOString() })); }
+function pendingWrite(data, baseRevision = currentRevision) { localStorage.setItem(PENDING_KEY, JSON.stringify({ familyId: currentFamilyId, data, baseRevision: Number(baseRevision || 0), savedAt: new Date().toISOString() })); }
 function pendingClear() { localStorage.removeItem(PENDING_KEY); }
 
 async function logActivity(type, description, metadata = {}) {
@@ -81,31 +81,60 @@ async function loadActivity() {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+async function applyRemoteRoot(familyId, root, options = {}) {
+  currentRevision = Number(root.dataRevision || 0);
+  lastRemoteUpdatedBy = root.dataUpdatedBy || '';
+  const payload = root.data || null;
+  if (!payload || !window.PDP_APP) return;
+  const members = await loadMembers(familyId);
+  payload.profile = payload.profile || {};
+  payload.profile.familyCode = familyId;
+  payload.members = members.map(m => ({
+    id: m.id, name: m.name || m.email || 'Familiare', role: roleLabel(m.role),
+    permission: m.permission || 'viewer', email: m.email || ''
+  }));
+  payload.activeMemberId = auth.currentUser.uid;
+  window.PDP_APP.replaceState(payload, { fromCloud: true, revision: currentRevision });
+  emitSync('synced', { revision: currentRevision, at: root.dataUpdatedAt?.toDate?.()?.toISOString?.() || '', source: options.source || 'cloud' });
+}
+
 async function activateFamily(familyId, member) {
   currentFamilyId = familyId; currentMember = member;
   show(familySetup, false); show(authScreen, false);
   document.body.classList.remove('auth-locked');
   if (unsubscribeFamily) unsubscribeFamily();
+
+  // Il cloud è la fonte principale dopo il login. Prima leggiamo esplicitamente
+  // Firestore, poi attiviamo il listener. Questo evita che una vecchia coda
+  // locale possa partire prima di conoscere la revisione cloud corrente.
+  emitSync('syncing', { phase: 'initial-load' });
+  const initialSnap = await getDoc(doc(db, 'families', familyId));
+  if (!initialSnap.exists()) throw new Error('Famiglia non trovata.');
+  await applyRemoteRoot(familyId, initialSnap.data(), { source: 'initial' });
+
   unsubscribeFamily = onSnapshot(doc(db, 'families', familyId), async snap => {
     if (!snap.exists()) return;
     const root = snap.data();
-    currentRevision = Number(root.dataRevision || 0);
-    lastRemoteUpdatedBy = root.dataUpdatedBy || '';
-    const payload = root.data || null;
-    const members = await loadMembers(familyId);
-    if (payload && window.PDP_APP && !saving) {
-      payload.profile = payload.profile || {};
-      payload.profile.familyCode = familyId;
-      payload.members = members.map(m => ({
-        id: m.id, name: m.name || m.email || 'Familiare', role: roleLabel(m.role),
-        permission: m.permission || 'viewer', email: m.email || ''
-      }));
-      payload.activeMemberId = auth.currentUser.uid;
-      window.PDP_APP.replaceState(payload, { fromCloud: true });
+    const remoteRevision = Number(root.dataRevision || 0);
+    if (remoteRevision < currentRevision) return;
+
+    const pending = pendingRead();
+    if (pending && pending.familyId === familyId) {
+      const remoteMs = root.dataUpdatedAt?.toMillis?.() || 0;
+      const pendingMs = Date.parse(pending.savedAt || '') || 0;
+      const baseRevision = Number(pending.baseRevision || 0);
+      // Una coda più vecchia del cloud non deve mai sovrascrivere dati aggiornati.
+      if (remoteRevision > baseRevision && pendingMs <= remoteMs) {
+        pendingClear();
+      } else if (remoteRevision > baseRevision && root.dataUpdatedBy !== auth.currentUser.uid) {
+        emitSync('conflict', { message: 'Esistono modifiche locali non inviate e una versione cloud più recente.', revision: remoteRevision });
+        return;
+      }
     }
+    await applyRemoteRoot(familyId, root, { source: 'listener' });
     updateAccountPanel();
-    emitSync('synced', { revision: currentRevision, at: root.dataUpdatedAt?.toDate?.()?.toISOString?.() || '' });
   }, err => emitSync('error', { message: err.message }));
+
   window.dispatchEvent(new CustomEvent('pdp-auth-ready', { detail: { user: auth.currentUser, familyId, member } }));
   await retryPending();
 }
@@ -206,14 +235,15 @@ async function saveFamilyData(data, options = {}) {
   const clean = cleanStateForCloud(data);
   clean.profile = clean.profile || {}; clean.profile.familyCode = currentFamilyId;
   clean.members = []; clean.activeMemberId = auth.currentUser.uid;
-  emitSync('syncing'); saving = true;
+  const baseRevision = Number(currentRevision || 0);
+  emitSync('syncing', { revision: baseRevision });
   try {
     const result = await runTransaction(db, async tx => {
       const ref = doc(db, 'families', currentFamilyId);
       const snap = await tx.get(ref);
       if (!snap.exists()) throw new Error('Famiglia non trovata.');
       const remoteRevision = Number(snap.data().dataRevision || 0);
-      if (!options.force && currentRevision && remoteRevision > currentRevision && snap.data().dataUpdatedBy !== auth.currentUser.uid) {
+      if (!options.force && remoteRevision > baseRevision && snap.data().dataUpdatedBy !== auth.currentUser.uid) {
         const err = new Error('Un altro familiare ha aggiornato i dati. Scarica prima la versione più recente.');
         err.code = 'pdp/conflict'; throw err;
       }
@@ -222,22 +252,42 @@ async function saveFamilyData(data, options = {}) {
       return nextRevision;
     });
     currentRevision = result; pendingClear();
-    emitSync('synced', { revision: result, at: new Date().toISOString() });
+    emitSync('synced', { revision: result, at: new Date().toISOString(), source: 'save' });
     return { synced: true, revision: result };
   } catch (err) {
     if (err.code !== 'pdp/conflict') {
-      pendingWrite(clean); emitSync('queued', { message: err.message });
+      pendingWrite(clean, baseRevision); emitSync('queued', { message: err.message, revision: baseRevision });
       return { synced: false, queued: true, message: err.message };
     }
     emitSync('conflict', { message: err.message }); throw err;
-  } finally { saving = false; }
+  }
 }
+
 async function retryPending() {
   const p = pendingRead();
   if (!p || p.familyId !== currentFamilyId || !navigator.onLine) return false;
+  const snap = await getDoc(doc(db, 'families', currentFamilyId));
+  if (!snap.exists()) return false;
+  const root = snap.data();
+  const remoteRevision = Number(root.dataRevision || 0);
+  const remoteMs = root.dataUpdatedAt?.toMillis?.() || 0;
+  const pendingMs = Date.parse(p.savedAt || '') || 0;
+  const baseRevision = Number(p.baseRevision || 0);
+
+  if (remoteRevision > baseRevision) {
+    if (pendingMs <= remoteMs) {
+      // Coda obsoleta: il cloud contiene già dati più recenti.
+      pendingClear();
+      await applyRemoteRoot(currentFamilyId, root, { source: 'discard-stale-pending' });
+      return false;
+    }
+    emitSync('conflict', { message: 'Modifiche locali in attesa e cloud più recente. Nessun dato è stato sovrascritto.', revision: remoteRevision });
+    return false;
+  }
   const result = await saveFamilyData(p.data).catch(()=>null);
   return !!result?.synced;
 }
+
 
 window.PDP_CLOUD = {
   isConfigured: () => configured,
@@ -246,6 +296,7 @@ window.PDP_CLOUD = {
   getFamilyId: () => currentFamilyId,
   getMember: () => currentMember,
   getRevision: () => currentRevision,
+  getDiagnostics: () => ({ familyId: currentFamilyId, userId: auth?.currentUser?.uid || '', revision: currentRevision, pending: pendingRead(), online: navigator.onLine }),
   save: saveFamilyData,
   retryPending,
   reload: async () => {
