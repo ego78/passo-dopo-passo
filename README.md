@@ -15,3 +15,10 @@ Aggiornamento cumulativo basato sulla 4.1.9.
 - Compatibilità con i vecchi ricordi che avevano un solo documentId.
 
 Non richiede modifiche a Code.gs o alle regole Firestore rispetto alla configurazione già funzionante.
+
+
+## Versione 4.1.12 - correzione cache/sync
+- Cancella dati locali elimina anche la coda cloud pendente.
+- Una coda locale non piu recente di Firestore viene scartata anche a parita di revisione.
+- Errori di permesso/configurazione non vengono piu salvati come tentativi offline.
+- Firestore resta la fonte autorevole dopo il login.

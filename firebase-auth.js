@@ -123,8 +123,11 @@ async function activateFamily(familyId, member) {
       const remoteMs = root.dataUpdatedAt?.toMillis?.() || 0;
       const pendingMs = Date.parse(pending.savedAt || '') || 0;
       const baseRevision = Number(pending.baseRevision || 0);
-      // Una coda più vecchia del cloud non deve mai sovrascrivere dati aggiornati.
-      if (remoteRevision > baseRevision && pendingMs <= remoteMs) {
+      // FIX 4.1.12: una coda locale che non è più recente del cloud viene sempre
+      // scartata, anche quando la revisione di base coincide. In precedenza una
+      // vecchia coda con baseRevision == remoteRevision poteva essere reinviata al
+      // riavvio e riportare l'app a dati obsoleti.
+      if (remoteRevision >= baseRevision && pendingMs <= remoteMs) {
         pendingClear();
       } else if (remoteRevision > baseRevision && root.dataUpdatedBy !== auth.currentUser.uid) {
         emitSync('conflict', { message: 'Esistono modifiche locali non inviate e una versione cloud più recente.', revision: remoteRevision });
@@ -256,8 +259,17 @@ async function saveFamilyData(data, options = {}) {
     return { synced: true, revision: result };
   } catch (err) {
     if (err.code !== 'pdp/conflict') {
-      pendingWrite(clean, baseRevision); emitSync('queued', { message: err.message, revision: baseRevision });
-      return { synced: false, queued: true, message: err.message };
+      const code = String(err?.code || '');
+      const networkLike = !navigator.onLine || code.includes('unavailable') || code.includes('deadline-exceeded') || code.includes('network');
+      if (networkLike) {
+        pendingWrite(clean, baseRevision);
+        emitSync('queued', { message: err.message, revision: baseRevision });
+        return { synced: false, queued: true, message: err.message };
+      }
+      // Errori di permesso/configurazione non devono creare code che potrebbero
+      // essere reinviate in un secondo momento con dati vecchi.
+      emitSync('error', { message: err.message, revision: baseRevision });
+      throw err;
     }
     emitSync('conflict', { message: err.message }); throw err;
   }
@@ -274,13 +286,13 @@ async function retryPending() {
   const pendingMs = Date.parse(p.savedAt || '') || 0;
   const baseRevision = Number(p.baseRevision || 0);
 
+  if (remoteRevision >= baseRevision && pendingMs <= remoteMs) {
+    // Il cloud è almeno altrettanto recente della coda: non reinviare mai la copia locale.
+    pendingClear();
+    await applyRemoteRoot(currentFamilyId, root, { source: 'discard-stale-pending' });
+    return false;
+  }
   if (remoteRevision > baseRevision) {
-    if (pendingMs <= remoteMs) {
-      // Coda obsoleta: il cloud contiene già dati più recenti.
-      pendingClear();
-      await applyRemoteRoot(currentFamilyId, root, { source: 'discard-stale-pending' });
-      return false;
-    }
     emitSync('conflict', { message: 'Modifiche locali in attesa e cloud più recente. Nessun dato è stato sovrascritto.', revision: remoteRevision });
     return false;
   }
